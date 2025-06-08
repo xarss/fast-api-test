@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.dependencies import get_db
-from app.services.user import create_user, get_user_by_id, get_users
-from app.models.user import CreateUserDto, UserResponseDto
+from app.services.user import create_user, get_user_by_id, get_users, update_user, update_user_role
+from app.models.user import CreateUserDto, UpdateUserRoleDto, UserResponseDto, UpdateUserDto
 
 router = APIRouter()
 
@@ -20,3 +20,11 @@ def get_user_endpoint(user_id: int, db: Session = Depends(get_db)):
     if user:
         return user
     return {"error": "User not found"}
+
+@router.put("/users/{id}", response_model=UserResponseDto)
+def update_user_endpoint(dto: UpdateUserDto, db: Session = Depends(get_db)):
+    return update_user(db=db, dto=dto)
+
+@router.put("/users/{id}/role", response_model=UserResponseDto)
+def update_user_role_endpoint(dto: UpdateUserRoleDto, db: Session = Depends(get_db)):
+    return update_user_role(db=db, dto=dto)

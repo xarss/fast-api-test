@@ -26,3 +26,12 @@ class UserResponseDto(CreateUserDto):
 
     class Config:
         from_attributes = True
+        
+class UpdateUserDto(BaseModel):
+    id: int
+    username: str
+    email: str
+
+class UpdateUserRoleDto(BaseModel):
+    id: int
+    role_id: int
