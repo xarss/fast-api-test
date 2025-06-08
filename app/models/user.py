@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from app.db import Base
 from pydantic import BaseModel
-from app.models.role import Role
+from app.models.role import Role, RoleResponseDto
 
 class User(Base):
     __tablename__ = "users"
@@ -22,6 +22,7 @@ class CreateUserDto(BaseModel):
 
 class UserResponseDto(CreateUserDto):
     id: int
+    role: RoleResponseDto
 
     class Config:
         from_attributes = True
