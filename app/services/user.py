@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy.orm import Session
 from app.models.user import User, UserResponseDto, CreateUserDto, UpdateUserDto, UpdateUserRoleDto
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 def create_user(db: Session, dto: CreateUserDto) -> UserResponseDto:
     db_user = User(
@@ -24,7 +24,10 @@ def update_user(db: Session, dto: UpdateUserDto) -> UserResponseDto | HTTPExcept
     db_user = db.query(User).filter(User.id == dto.id).first()
     
     if(not db_user):
-        return HTTPException(404, f"Could not find user with Id '{dto.id}'")
+        return HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            f"Could not find user with Id '{dto.id}'"
+        )
     
     db_user.username = dto.username # type: ignore
     db_user.email = dto.email # type: ignore
@@ -38,7 +41,10 @@ def update_user_role(db: Session, dto: UpdateUserRoleDto) -> UserResponseDto | H
     db_user = db.query(User).filter(User.id == dto.id).first()
     
     if(not db_user):
-        return HTTPException(404, f"Could not find user with Id '{dto.id}'")
+        return HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            f"Could not find user with Id '{dto.id}'"
+        )
     
     db_user.role_id = dto.role_id # type: ignore
     
