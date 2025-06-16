@@ -31,12 +31,13 @@ def verify_google_token(id_token_str: str) -> GoogleUser:
         username = name
     )
 
-def create_jwt_token(id: str, email: str, username: str):
+def create_jwt_token(id: str, email: str, username: str, role_id: int):
     try:
         payload: dict[str, Any] = {
             "sub": id,
             "email": email,
             "name": username,
+            "role_id": role_id,
             "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1)
         }
         
@@ -53,13 +54,14 @@ def get_google_access_token(db: Session, id_token: str) -> AccessTokenResponse:
     user = db.query(User).filter(User.google_id == google_user.id).first()
 
     if not user:
-        create_user(db, username=google_user.username, email=google_user.email)
+        user = create_user(db, username=google_user.username, email=google_user.email)
         update_user_google_id(db, email=google_user.username, google_id=google_user.id)
 
     jwt_token = create_jwt_token(
-        id=google_user.id,
-        email=google_user.email,
-        username=google_user.username
+        id=user.id, # type: ignore
+        email=user.email, # type: ignore
+        username=user.username, # type: ignore
+        role_id=user.role_id # type: ignore
     )
 
     return AccessTokenResponse(access_token=jwt_token)
@@ -77,7 +79,8 @@ def get_access_token(db: Session, email: str, password: str) -> AccessTokenRespo
     token = create_jwt_token(
         id=user.google_id or str(user.id), # fallback if not Google user # type: ignore
         email=user.email, # type: ignore
-        username=user.username # type: ignore
+        username=user.username, # type: ignore
+        role_id=user.role_id # type: ignore
     )
 
     return AccessTokenResponse(access_token=token)
