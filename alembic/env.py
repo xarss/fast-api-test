@@ -1,27 +1,17 @@
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-from dotenv import load_dotenv
-import os
+from ..app.config import DATABASE_URL
 
 # Models Import
 from app.db import Base
-from app.models.user import User
-from app.models.role import Role
-
-load_dotenv()
+from app.models.user_models import User
+from app.models.role_models import Role
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
-
-# Dinamically setting the databse url using the '.env' value
-# instead of the 'alembic.ini', that will be commited.
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if(not DATABASE_URL):
-    raise KeyError("Could not find DATABASE_URL in environment config.")
 
 config.set_main_option('sqlalchemy.url', DATABASE_URL)
 

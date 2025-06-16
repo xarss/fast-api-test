@@ -4,3 +4,6 @@ sqlalchemy
 pydantic
 mysqlclient
 python-dotenv
+passlib[bcrypt]
+google-auth
+pyjwt

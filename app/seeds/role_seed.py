@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models.role import Role
+from app.models.role_models import Role
 
 def seed_roles(db: Session):
     if db.query(Role).filter(Role.name == "Default").first() is None:

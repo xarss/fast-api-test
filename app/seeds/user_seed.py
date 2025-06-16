@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models.user import User
+from app.models.user_models import User
 
 def seed_users(db: Session):
     admin = db.query(User).filter(
