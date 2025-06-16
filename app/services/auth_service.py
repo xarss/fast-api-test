@@ -1,7 +1,3 @@
-import jwt
-import datetime
-
-from typing import Any
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from passlib.context import CryptContext
@@ -9,9 +5,10 @@ from app.models.auth_models import AccessTokenResponse, GoogleUser
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.models.user_models import User
+from app.services.jwt_service import create_jwt_token
 from app.services.password_service import verify_password
 from app.services.user_service import create_user, update_user_google_id, update_user_password
-from ..config import GOOGLE_CLIENT_ID, JWT_SECRET_KEY
+from ..config import GOOGLE_CLIENT_ID
 
 context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -30,24 +27,6 @@ def verify_google_token(id_token_str: str) -> GoogleUser:
         email = email,
         username = name
     )
-
-def create_jwt_token(id: str, email: str, username: str, role_id: int):
-    try:
-        payload: dict[str, Any] = {
-            "sub": id,
-            "email": email,
-            "name": username,
-            "role_id": role_id,
-            "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1)
-        }
-        
-        token = jwt.encode(payload, JWT_SECRET_KEY, algorithm="HS256")
-        return token
-    except:
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            "Could not generate JSON Web Token"
-        )
 
 def get_google_access_token(db: Session, id_token: str) -> AccessTokenResponse:
     google_user = verify_google_token(id_token)
