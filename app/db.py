@@ -8,7 +8,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if(not DATABASE_URL):
+if not DATABASE_URL:
     raise KeyError("Could not find DATABASE_URL in environment config.")
 
 engine = create_engine(DATABASE_URL, pool_size=10, max_overflow=20)

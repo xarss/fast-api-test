@@ -11,7 +11,7 @@ try:
 except:
     raise ValueError("One or more mandatory environment values are missing.")
 
-if(not DATABASE_URL):
+if not DATABASE_URL:
     raise KeyError("Could not find DATABASE_URL in environment config.")
 
 if not GOOGLE_CLIENT_ID:
