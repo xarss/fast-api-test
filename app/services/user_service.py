@@ -24,20 +24,22 @@ def create_user(db: Session, username: str, email: str, role_id: int = 1) -> Use
 
     return db_user
 
-def get_user_by_id(db: Session, id: int) -> UserResponseDto:
-    return db.query(User).filter(User.id == id).first()
+def get_user_by_id(db: Session, id: int) -> User:
+    db_user = db.query(User).filter(User.id == id).first()
+    
+    if not db_user:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            f"Could not find user with id '{id}'"
+        )
+    
+    return db_user
 
 def get_users(db: Session) -> List[UserResponseDto]:
     return list(db.query(User).all())
 
 def update_user(db: Session, id: int, username: str, email: str) -> UserResponseDto:
-    db_user = db.query(User).filter(User.id == id).first()
-    
-    if(not db_user):
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            f"Could not find user with Id '{id}'"
-        )
+    db_user = get_user_by_id(db=db, id=id)
     
     db_user.username = username # type: ignore
     db_user.email = email # type: ignore
@@ -47,28 +49,33 @@ def update_user(db: Session, id: int, username: str, email: str) -> UserResponse
     
     return db_user
 
+def get_user_by_email(db: Session, email: str) -> User:
+    db_user = db.query(User).filter(User.email == email).first()
+    
+    if not db_user:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            f"Could not find user with email '{email}'"
+        )
+        
+    return db_user
+
 def update_user_password(db: Session, email: str, new_password: str) -> None:
-    user = db_user = db.query(User).filter(User.email == email).first()
-    user.password = hashed(new_password) # type: ignore
+    db_user = db.query(User).filter(User.email == email).first()
+    db_user.password = hashed(new_password) # type: ignore
     
     db.commit()
     db.refresh(db_user)
 
 def update_user_google_id(db: Session, email: str, google_id: str) -> None:
-    user = db_user = db.query(User).filter(User.email == email).first()
-    user.google_id = google_id # type: ignore
+    db_user = db.query(User).filter(User.email == email).first()
+    db_user.google_id = google_id # type: ignore
     
     db.commit()
     db.refresh(db_user)
 
 def update_user_role(db: Session, id: int, role_id: int) -> UserResponseDto:
-    db_user = db.query(User).filter(User.id == id).first()
-    
-    if(not db_user):
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            f"Could not find user with Id '{id}'"
-        )
+    db_user = get_user_by_id(db=db, id=id)
     
     db_user.role_id = role_id # type: ignore
     
